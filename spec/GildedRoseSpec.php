@@ -1,6 +1,6 @@
 <?php
 
-use App\Item;
+use App\Items\Item;
 use App\GildedRose;
 
 describe('Gilded Rose', function () {
@@ -151,7 +151,7 @@ describe('Gilded Rose', function () {
                 expect($gr->getItem(0)->sellIn)->toBe(-2);
             });
         });
-        /*
+
         context("Conjured Items", function () {
             it('updates Conjured items before the sell date', function () {
                 $gr = new GildedRose([new Item('Conjured Mana Cake', 10, 10)]);
@@ -190,6 +190,33 @@ describe('Gilded Rose', function () {
                 expect($gr->getItem(0)->sellIn)->toBe(-11);
             });
         });
-        */
+    });
+
+    describe("accessing inventory", function () {
+        context("Get Item", function () {
+            it('fetches an item from inventory by index', function () {
+                $itemToFetch = new Item('Conjured Mana Cake', 10, 10);
+
+                $gr = new GildedRose([new Item('Misc', 1, 2), $itemToFetch, new Item('Aged Brie', 10, 5)]);
+                expect($gr->getItem(1))->toBe($itemToFetch);
+            });
+            it('fetches an item using an index which does not exist in the inventory', function () {
+                $gr = new GildedRose([new Item('Misc', 1, 2), new Item('Aged Brie', 10, 5)]);
+                expect($gr->getItem(10))->toBe(false);
+            });
+            it('fetches an item using an invalid index argument', function () {
+                $gr = new GildedRose([new Item('Misc', 1, 2), new Item('Aged Brie', 10, 5)]);
+                expect($gr->getItem(null))->toBe(false);
+            });
+        });
+
+        context("Get Items", function () {
+            it('fetches the whole item inventory', function () {
+                $inventory = [new Item('Misc', 1, 2), new Item('Conjured Mana Cake', 10, 10), new Item('Aged Brie', 10, 5)];
+
+                $gr = new GildedRose($inventory);
+                expect($gr->getItems())->toBe($inventory);
+            });
+        });
     });
 });

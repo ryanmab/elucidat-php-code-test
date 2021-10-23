@@ -2,69 +2,45 @@
 
 namespace App;
 
+use App\Factories\ItemFactory;
+
 class GildedRose
 {
     private $items;
 
-    public function __construct(array $items)
-    {
+    public function __construct(array $items) {
         $this->items = $items;
     }
 
-    public function getItem($which = null)
-    {
-        return ($which === null
-            ? $this->items
-            : $this->items[$which]
-        );
+    /**
+     * Get item by index from inventory
+     *
+     * @param $which
+     * @return false|mixed
+     */
+    public function getItem($which) {
+        if (!is_int($which) || !isset($this->items[$which])) {
+            return false;
+        }
+
+        return $this->items[$which];
     }
 
-    public function nextDay()
-    {
-        foreach ($this->items as $item) {
-            if ($item->name != 'Aged Brie' and $item->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                if ($item->quality > 0) {
-                    if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                        $item->quality = $item->quality - 1;
-                    }
-                }
-            } else {
-                if ($item->quality < 50) {
-                    $item->quality = $item->quality + 1;
-                    if ($item->name == 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->sellIn < 11) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                        if ($item->sellIn < 6) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                    }
-                }
-            }
-            if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                $item->sellIn = $item->sellIn - 1;
-            }
-            if ($item->sellIn < 0) {
-                if ($item->name != 'Aged Brie') {
-                    if ($item->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->quality > 0) {
-                            if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                                $item->quality = $item->quality - 1;
-                            }
-                        }
-                    } else {
-                        $item->quality = $item->quality - $item->quality;
-                    }
-                } else {
-                    if ($item->quality < 50) {
-                        $item->quality = $item->quality + 1;
-                    }
-                }
-            }
+    /**
+     * Get all items from inventory
+     *
+     * @return array
+     */
+    public function getItems() {
+        return $this->items;
+    }
+
+    /**
+     * Handle the next day for the whole inventory
+     */
+    public function nextDay() {
+        foreach ($this->items as $i => $item) {
+            ($this->items[$i] = ItemFactory::getInstance($item))->degrade();
         }
     }
 }
